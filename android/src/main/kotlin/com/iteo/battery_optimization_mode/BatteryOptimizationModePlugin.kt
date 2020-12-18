@@ -99,11 +99,7 @@ class BatteryOptimizationModePlugin : FlutterPlugin, MethodCallHandler {
                     tryToOpenBatterySettingsWithFallback(this, intent)
                 }
                 else -> {
-                    try {
-                        startActivity(Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS))
-                    } catch (ex: ActivityNotFoundException) {
-                        startActivity(Intent(Settings.ACTION_SETTINGS))
-                    }
+                    openFallbackScreen(this)
                 }
             }
         }
@@ -114,11 +110,19 @@ class BatteryOptimizationModePlugin : FlutterPlugin, MethodCallHandler {
         try {
             context.startActivity(intent);
         } catch (ex: ActivityNotFoundException) {
-            try {
-                context.startActivity(Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS))
-            } catch (ex: ActivityNotFoundException) {
-                context.startActivity(Intent(Settings.ACTION_SETTINGS))
-            }
+            openFallbackScreen(context)
+        }
+    }
+
+    private fun openFallbackScreen(context: Context) {
+        try {
+            val fallbackIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
+            fallbackIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(fallbackIntent)
+        } catch (ex: ActivityNotFoundException) {
+            val fallbackIntent = Intent(Settings.ACTION_SETTINGS)
+            fallbackIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            context.startActivity(fallbackIntent)
         }
     }
 

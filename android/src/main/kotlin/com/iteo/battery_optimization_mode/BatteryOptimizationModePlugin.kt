@@ -87,15 +87,21 @@ class BatteryOptimizationModePlugin : FlutterPlugin, MethodCallHandler {
                     tryToOpenBatterySettingsWithFallback(this, intent)
                 }
                 Build.MANUFACTURER.toLowerCase(Locale.ROOT) == "huawei" -> {
-                    val intent = Intent()
-                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.optimize.process.ProtectActivity")
+                    var intent = Intent()
+
+                    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N) {
+                        intent = packageManager.getLaunchIntentForPackage("com.huawei.systemmanager") ?: Intent()
+                        intent.flags = intent.flags or Intent.FLAG_ACTIVITY_NEW_TASK
+                    } else {
+                        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+                        intent.component = ComponentName("com.huawei.systemmanager", "com.huawei.systemmanager.power.ui.HwPowerManagerActivity")
+                    }
                     tryToOpenBatterySettingsWithFallback(this, intent)
                 }
                 Build.MANUFACTURER.toLowerCase(Locale.ROOT) == "xiaomi" -> {
                     val intent = Intent()
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-                    intent.component = ComponentName("com.miui.securitycenter", "com.miui.permcenter.autostart.AutoStartManagementActivity")
+                    intent.component = ComponentName("com.miui.securitycenter", "com.miui.powercenter.PowerSettings")
                     tryToOpenBatterySettingsWithFallback(this, intent)
                 }
                 else -> {
